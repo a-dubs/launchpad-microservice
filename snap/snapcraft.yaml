@@ -1,0 +1,41 @@
+name: lp-microservice
+base: core24
+version: '1.0.0'
+summary: A launchpad microservice
+description: |
+  A custom snap that runs a daemon microservice for cpc-launchpad-extension to use
+
+grade: devel
+confinement: classic
+
+apps:
+  lp-microservice:
+    environment:
+      PYTHONPATH: $SNAP/lib/python3.12/site-packages/
+    command: bin/lp_microservice_run
+    daemon: simple
+  initialize:
+    environment:
+      PYTHONPATH: $SNAP/lib/python3.12/site-packages/
+    command: bin/lp_microservice_init
+
+parts:
+  lp-microservice:
+    plugin: python
+    source: .
+    # source-type: git
+    # build-environment:
+      # - C_INCLUDE_PATH: /usr/include/python3.10/
+      # - PYTHONPATH: "$SNAPCRAFT_PART_INSTALL/usr/lib/python3/dist-packages"
+    stage-packages: 
+      - python3.12-minimal
+    python-packages:
+      - fastapi
+      - uvicorn
+      - requests
+      - pydantic
+      - pydanctic-core
+    # override-build: |
+    #   pip install -vvv .
+    #   snapcraftctl build
+# https://pastebin.canonical.com/p/tYQQk67Mh3/

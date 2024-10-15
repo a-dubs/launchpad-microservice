@@ -1,1 +1,20 @@
 .vscode
+
+# ignore common python files
+*.pyc
+*.pyo
+*.pyd
+
+# ignore python cache
+__pycache__/
+
+# ignore python env
+venv/
+
+# ignore python build
+build/
+dist/
+*.egg-info/
+
+# ignore secrets 
+.env

@@ -1,0 +1,48 @@
+# pyproject.toml
+
+[build-system]
+requires = ["setuptools>=42", "wheel", "mypy; extra == 'type_check'"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lp-microservice"
+version = "1.0.0"
+description = "A custom snap that runs a daemon microservice for cpc-launchpad-extension to use"
+authors = [
+    { name="a-dubs", email="alecwarren19@gmail.com" }
+]
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "requests",
+    "fastapi",
+    "uvicorn",
+]
+
+[project.scripts]
+# Entry points for the package
+lp_microservice_init = "lp_microservice.init_auth:main"
+lp_microservice_run = "lp_microservice.main:run_server"
+
+[tool.black]
+line-length = 120
+target-version = ['py36']
+
+[tool.isort]
+profile = "black"
+line_length = 120
+
+[tool.mypy]
+follow_imports = "silent"
+warn_unused_ignores = "true"
+warn_redundant_casts = "true"
+exclude=[]
+
+[tool.setuptools.packages.find]
+exclude = ["snap"]
