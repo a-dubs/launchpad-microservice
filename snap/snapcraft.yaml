@@ -34,7 +34,6 @@ parts:
       - uvicorn
       - requests
       - pydantic
-      - pydanctic-core
     # override-build: |
     #   pip install -vvv .
     #   snapcraftctl build
