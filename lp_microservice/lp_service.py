@@ -7,6 +7,10 @@ import json
 import webbrowser
 import time
 
+import os
+import time
+import json
+
 import logging
 from pprint import pformat
 import os
@@ -30,12 +34,41 @@ def log_pprint(obj, level=logging.INFO):
         logger.log(level, pformat(obj))
 
 LP_CREDS = None
-LP_CREDS_PATH = os.path.expanduser("~/.lp-microservice-creds.json")
-print(LP_CREDS_PATH)
+
+logger.info("Hello from lp_service.py")
 
 ##############################################################################
 ############################### Authentication ###############################
 ##############################################################################
+
+def is_authenticated() -> bool:
+    # check if a json file exists at LP_CREDS_PATH
+    return os.path.exists(LP_CREDS_PATH)
+
+LP_CREDS_PATH = "/var/opt/lp-microservice/launchpad_creds.json"
+logger.debug("LP_CREDS_PATH:", LP_CREDS_PATH)
+
+def wait_for_credentials(timeout=300, poll_interval=5):
+    global LP_CREDS
+    """
+    Wait for the credentials file to be created.
+    Poll every `poll_interval` seconds, and timeout after `timeout` seconds.
+    """
+    start_time = time.time()
+    logger.info("Looking for credentials at %s", LP_CREDS_PATH)
+    while not os.path.exists(LP_CREDS_PATH):
+        elapsed_time = time.time() - start_time
+        if elapsed_time > timeout:
+            logger.info("Error: Authentication not completed in time. Exiting.")
+            return False
+        logger.info("Waiting for credentials... Please complete authentication using the initialize command.")
+        time.sleep(poll_interval)
+    #  now read the credentials into LP_CREDS
+    with open(LP_CREDS_PATH, "r") as f:
+        LP_CREDS = json.load(f)
+    logger.info("Credentials found. Starting the server.")
+    return True
+
 
 def _auth_step_1() -> tuple[str, str]:
     data = {
@@ -74,6 +107,8 @@ def _auth_step_3(oauth_token: str, oauth_token_secret: str):
     # Get access_token and access_secret from response
     access_token = r.text.split("&")[0].split("=")[1]
     access_secret = r.text.split("&")[1].split("=")[1]
+    # make directory if it doesn't exist
+    os.makedirs(os.path.dirname(LP_CREDS_PATH), exist_ok=True)
     with open(LP_CREDS_PATH, "w") as f:
         json.dump({"access_token": access_token, "access_secret": access_secret}, f)
     logger.debug(f"Access token and secret saved to {LP_CREDS_PATH}")
@@ -147,8 +182,8 @@ def _lp_post(url: str, params: dict = {}, data: dict = {}, verbose: bool = False
     if verbose:
         log_pprint(data, level=logging.INFO)
     if r.status_code >= 400:
-        logger.error(f"[POST FAILED] {r.status_code} {r.reason} for {r.url} with params {params}")
-        return None
+        logger.error(f"[POST FAILED] {r.status_code} {r.reason} for {r.url} with params {params} and data {data}")
+        raise Exception(f"Failed to post data to {url} with params {params} and data {data}")
     return r
 
 def _stringify_dict(d: dict):
@@ -249,6 +284,7 @@ def _put_draft_inline_comments(mp_url, preview_diff_id, comments: dict[str, str]
         "previewdiff_id": preview_diff_id,
     }
     r = _lp_post(mp_url, data=payload)
+    # raise an exception if the request failed
     return r
 
 def cancel_inline_draft_comment(mp_url, preview_diff_id, line_no):
@@ -310,7 +346,7 @@ def submit_and_post_inline_comment(
     logger.info(f"Posting inline comment at line {line_no} with message: {comment}")
     payload = {
         "ws.op": "createComment",
-        "content": '[ Added inline comment via launchpyd ]',
+        "content": "",
         "inline_comments": _stringify_dict({str(line_no): comment}),
         "previewdiff_id": preview_diff_id,
     }
@@ -346,7 +382,7 @@ def _simplify_incline_comments(inline_comments: list[dict]) -> list[dict]:
         {
             "date": comment["date"],
             "line_number": comment["line_number"],
-            "person": _simplify_person_dict(comment["person"]),
+            "author": _simplify_person_dict(comment["person"]),
             "text": comment["text"],
         }
         for comment in inline_comments

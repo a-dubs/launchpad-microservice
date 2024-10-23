@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException
+import os
+import sys
 from typing import Union
 import logging
 from lp_microservice.lp_service import (
@@ -11,7 +12,9 @@ from lp_microservice.lp_service import (
     get_comments,
     post_review_comment,
     post_comment,
-    ReviewVote
+    ReviewVote,
+    wait_for_credentials,
+    LP_CREDS_PATH,
 )
 
 # Initialize the FastAPI app
@@ -21,8 +24,7 @@ app = FastAPI()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Perform authentication when the server starts
-perform_authentication()
+logger.info("Hello from main.py")
 
 @app.get("/get_draft_inline_comments")
 def api_get_draft_inline_comments(mp_url: str, preview_diff_id: Union[str, int]):
@@ -108,6 +110,22 @@ def api_post_comment(mp_url: str, comment: str):
         logger.exception("Error in post_comment")
         raise HTTPException(status_code=500, detail=str(e))
 
+def prepare_creds_location():
+    logger.debug("Preparing credentials location")
+    # use LP_CREDS_PATH
+    # create directory if it doesn't exist and set permissions to be writeable by anyone (777)
+    os.makedirs(os.path.dirname(LP_CREDS_PATH), exist_ok=True)
+    # set permissions to be writeable by anyone (777)
+    os.chmod(os.path.dirname(LP_CREDS_PATH), 0o777)
+
 def run_server():
+    prepare_creds_location()
+    # Poll for the credentials file, waiting until it exists
+    logger.info("Checking for authentication credentials...")
+    if not wait_for_credentials():
+        logger.info("Authentication not completed. Exiting daemon.")
+        sys.exit(1)
+
+    # If credentials exist, start the web server
     import uvicorn
-    uvicorn.run("lp_microservice.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
