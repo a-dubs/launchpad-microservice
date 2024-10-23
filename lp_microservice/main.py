@@ -1,5 +1,6 @@
 import os
 import sys
+from fastapi import Body, FastAPI, HTTPException
 from typing import Union
 import logging
 from lp_microservice.lp_service import (
@@ -35,7 +36,12 @@ def api_get_draft_inline_comments(mp_url: str, preview_diff_id: Union[str, int])
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/cancel_inline_draft_comment")
-def api_cancel_inline_draft_comment(mp_url: str, preview_diff_id: Union[str, int], line_no: Union[str, int]):
+def api_cancel_inline_draft_comment(
+    mp_url: str = Body(...),
+    preview_diff_id: Union[str, int] = Body(...),
+    line_no: Union[str, int] = Body(...)
+):
+    logger.debug("[/cancel_inline_draft_comment] received:", mp_url, preview_diff_id, line_no)
     try:
         cancel_inline_draft_comment(mp_url, str(preview_diff_id), str(line_no))
         return {"status": "Draft comment canceled successfully"}
@@ -53,12 +59,13 @@ def api_get_inline_comments(mp_url: str, preview_diff_id: Union[str, int]):
 
 @app.post("/submit_and_post_inline_comment")
 def api_submit_and_post_inline_comment(
-    mp_url: str,
-    preview_diff_id: Union[str, int],
-    line_no: Union[str, int],
-    comment: str,
-    delete_existing_draft: bool = True
+    mp_url: str = Body(...),
+    preview_diff_id: Union[str, int] = Body(...),
+    line_no: Union[str, int] = Body(...),
+    comment: str = Body(...),
+    delete_existing_draft: bool = Body(default=True),
 ):
+    logger.debug("[/submit_and_post_inline_comment] received:", mp_url, preview_diff_id, line_no, comment, delete_existing_draft)
     try:
         submit_and_post_inline_comment(
             mp_url, str(preview_diff_id), str(line_no), comment, delete_existing_draft
@@ -68,8 +75,15 @@ def api_submit_and_post_inline_comment(
         logger.exception("Error in submit_and_post_inline_comment")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.post("/save_draft_inline_comment")
-def api_save_draft_inline_comment(mp_url: str, preview_diff_id: Union[str, int], line_no: Union[str, int], comment: str):
+def api_save_draft_inline_comment(
+    mp_url: str = Body(...),
+    preview_diff_id: Union[str, int] = Body(...),
+    line_no: Union[str, int] = Body(...),
+    comment: str = Body(...)
+):
+    logger.debug("[/save_draft_inline_comment] received:", mp_url, preview_diff_id, line_no, comment)
     try:
         save_draft_inline_comment(mp_url, str(preview_diff_id), str(line_no), comment)
         return {"status": "Draft inline comment saved successfully"}
@@ -88,7 +102,12 @@ def api_get_comments(mp_url: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/post_review_comment")
-def api_post_review_comment(mp_url: str, comment: str, review_vote: str = ""):
+def api_post_review_comment(
+    mp_url: str = Body(...),
+    comment: str = Body(...),
+    review_vote: str = Body(default="")
+):
+    logger.debug("[/post_review_comment] received:", mp_url, comment, review_vote)
     try:
         # Cast review_vote to ReviewVote enum, defaulting to NONE if empty
         review_vote_enum = ReviewVote(review_vote) if review_vote else ReviewVote.NONE
@@ -102,7 +121,11 @@ def api_post_review_comment(mp_url: str, comment: str, review_vote: str = ""):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/post_comment")
-def api_post_comment(mp_url: str, comment: str):
+def api_post_comment(
+    mp_url: str = Body(...),
+    comment: str = Body(...)
+):
+    logger.debug("[/post_comment] received:", mp_url, comment)
     try:
         post_comment(mp_url, comment)
         return {"status": "Comment posted successfully"}
