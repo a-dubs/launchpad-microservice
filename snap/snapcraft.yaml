@@ -1,6 +1,6 @@
 name: lp-microservice
 base: core22
-version: '1.0.0'
+version: '1.1.0'
 summary: A launchpad microservice
 description: |
   A custom snap that runs a daemon microservice for cpc-launchpad-extension to use
