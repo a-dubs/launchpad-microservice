@@ -199,4 +199,4 @@ def run_server():
 
     # If credentials exist, start the web server
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8698)
