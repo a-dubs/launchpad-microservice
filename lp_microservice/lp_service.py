@@ -2,6 +2,7 @@ import enum
 from itertools import islice
 import random
 import time
+from typing import Union
 import requests
 import json
 import webbrowser
@@ -12,6 +13,7 @@ import time
 import json
 
 import logging
+from diskcache import Cache
 from pprint import pformat
 import os
 
@@ -46,6 +48,11 @@ def is_authenticated() -> bool:
     return os.path.exists(LP_CREDS_PATH)
 
 LP_CREDS_PATH = "/var/opt/lp-microservice/launchpad_creds.json"
+
+# Setup disk caching
+CACHE_DIRECTORY = "/var/cache/lp-microservice"
+CACHE=Cache(CACHE_DIRECTORY)
+
 logger.debug("LP_CREDS_PATH:", LP_CREDS_PATH)
 
 def wait_for_credentials(timeout=300, poll_interval=5):
@@ -398,3 +405,11 @@ def _simplify_person_dict(person_dict):
         "logo_link": person_dict["logo_link"],
         "mugshot_link": person_dict["mugshot_link"],
     }
+
+def get_preview_diff_text(
+    mp_url: str, 
+    preview_diff_id: Union[int,str],
+) -> str:
+    diff_text_url = f"{mp_url}/+preview-diff/{preview_diff_id}/diff_text"
+    r = _lp_get(diff_text_url)
+    return r.content.decode("utf-8")

@@ -76,6 +76,28 @@
 # pprint(draft_ilc)
 
 import lp_microservice.lp_service as lp_service
+from pprint import pprint
+
 
 mp_url = "https://code.launchpad.net/~a-dubs/cloudware/+git/oraclelib/+merge/455155"
+lp_service.perform_authentication()
 
+# # mp_url = "https://code.launchpad.net/~a-dubs/cloudware/+git/cpc_jenkins/+merge/466022"
+
+# inline_comments = lp_service.get_inline_comments(mp_url, "1055515")
+# comments = lp_service.get_comments(mp_url)["entries"]
+
+# # find inline comments with "posting this immediately without saving as draft" as text and print out their date_created
+# print("inline_comments")
+# for comment in inline_comments:
+#     if comment["text"] == "posting this immediately without saving as draft":
+#         print(comment["date"])
+
+# # print out all dates of comments with "[ Added inline comment via launchpyd ]" as message_body
+# print ("comments")
+# for comment in comments:
+#     if comment["message_body"] == "[ Added inline comment via launchpyd ]":
+#         print(comment["date_created"])
+
+
+print(lp_service.fetch_diff_text(mp_url, "1055515"))

@@ -16,6 +16,8 @@ from lp_microservice.lp_service import (
     ReviewVote,
     wait_for_credentials,
     LP_CREDS_PATH,
+    CACHE,
+    get_preview_diff_text,
 )
 
 # Initialize the FastAPI app
@@ -132,6 +134,52 @@ def api_post_comment(
     except Exception as e:
         logger.exception("Error in post_comment")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/preview_diff/text")
+def api_preview_diff_text(
+    mp_url: str,
+    preview_diff_id: Union[str, int],
+) -> str:
+    """
+    Get the text of the preview diff with the given preview_diff_id, caching the result if not previously fetched.
+    
+    Args:
+        mp_url (str): The Mattermost MP URL.
+        preview_diff_id (Union[str, int]): The preview diff ID.
+
+    Returns:
+        str: The text of the preview diff.
+    """
+    # Create a unique cache key based on the query parameters
+    cache_key = f"{mp_url}_{preview_diff_id}"
+
+    # Check if result is cached
+    cached_result = CACHE.get(cache_key)
+    if cached_result:
+        logger.debug(f"Using cached result for diff text with key: {cache_key}")
+        return cached_result
+
+    try:
+        logger.debug(f"No cached result found for diff text with key: {cache_key}")
+        # Fetch the data
+        result = get_preview_diff_text(mp_url, str(preview_diff_id))
+
+        # Cache the result
+        CACHE.set(
+            key=cache_key,
+            value=result,
+            expire=None, # No expiration since the preview diff text is immutable
+        )
+        return result
+
+    except Exception as e:
+        logger.exception("Error in api_preview_diff_text")
+        raise HTTPException(status_code=500, detail=str(e))
+
+##############################################################################################
+##############################################################################################
+##############################################################################################
 
 def prepare_creds_location():
     logger.debug("Preparing credentials location")

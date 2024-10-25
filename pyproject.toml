@@ -23,6 +23,7 @@ dependencies = [
     "requests",
     "fastapi",
     "uvicorn",
+    "diskcache",
 ]
 
 [project.scripts]
