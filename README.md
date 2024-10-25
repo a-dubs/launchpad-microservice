@@ -1,6 +1,6 @@
 # Launchpad Microservice (lp-microservice) 
 
-![Static Badge](https://img.shields.io/badge/version-v1.1.0-orange)
+![Static Badge](https://img.shields.io/badge/version-v2.0.0-orange)
 
 This microservice will run locally on your machine using snap daemon. Installing this is necessary for using my custom
 [Launchpad Firefox Extension](https://github.com/a-dubs/lp-firefox-extension).
@@ -21,7 +21,7 @@ This microservice will run locally on your machine using snap daemon. Installing
    download the latest snap package.
 2. Navigate to the directory you download the snap package to and install the snap package using the following command:
    ```bash
-   sudo snap install --classic --dangerous lp-microservice_1.1.0_amd64.snap
+   sudo snap install --classic --dangerous lp-microservice_2.0.0_amd64.snap
    ```
 3. After installing, you need to authenticate the microservice with Launchpad. To do this, run the following command:
    ```bash
