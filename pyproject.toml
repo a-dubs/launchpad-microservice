@@ -31,19 +31,59 @@ dependencies = [
 lp_microservice_init = "lp_microservice.init_auth:main"
 lp_microservice_run = "lp_microservice.main:run_server"
 
-[tool.black]
-line-length = 120
-target-version = ['py36']
-
-[tool.isort]
-profile = "black"
-line_length = 120
-
 [tool.mypy]
 follow_imports = "silent"
 warn_unused_ignores = "true"
 warn_redundant_casts = "true"
+no_implicit_optional = "true"
+check_untyped_defs = "true"
+warn_return_any = "true"
 exclude=[]
+
+
+[[tool.mypy.overrides]]
+module = [
+  # add any files/dirs here that need to have type annotations added
+  # and then remove them from this list once they have type annotation added later
+]
+check_untyped_defs = false
+
+[[tool.mypy.overrides]]
+module = [
+  # add any dependencies that cause mypy issues here
+]
+ignore_missing_imports = true
+no_implicit_optional = true
+
+
+[tool.ruff]
+line-length = 120
+target-version = "py38"  # for focal support
+preview = true  # use rules that are "unstable and in preview"
+exclude = []  # files to exclude from linting
+
+[tool.ruff.lint]
+select = [
+  # Explicitly enable these ruff rules. See https://docs.astral.sh/ruff/rules/
+# Mandatory rules to adhere to (minimal effort but high impact)
+  "E2", # E2xx: Pycodestyle formatting issues
+  "E4", # E4xx: Pycodestyle import-related errors
+  "E7", # E7xx: Pycodestyle syntax errors
+  "E9", # E9xx: Pycodestyle indentation errors
+  "F",  # Fxxx: Pyflakes checks (undefined names, unused imports)
+  "W",  # Wxxx: Pycodestyle warnings (whitespace issues)
+  "PLE", # PLExxx: Pylint errors
+  "PLW", # PLWxxx: Pylint warnings
+# OPTIONAL: Enable pylint rules which are much more strict than the default ruff rules 
+#   "PLC", # PLCxxx: Pylint conventions 
+#   "PLR", # PLCxxx: Pylint refactoring suggestions
+# OPTIONAL: Enable flake8 plugins for suggestions to reduce potential bugs and security issues
+#   "B",  # Bxxx: Bugs and design issues (from `flake8-bugbear`)
+#   "S",  # Sxxx: Security issues (from `flake8-bandit`)
+]
+ignore = [
+  # Any specific ruff rules to ignore (e.g. "PLW2901"). See https://docs.astral.sh/ruff/rules/
+]
 
 [tool.setuptools.packages.find]
 exclude = ["snap"]

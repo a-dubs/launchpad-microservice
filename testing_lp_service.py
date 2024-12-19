@@ -1,4 +1,4 @@
-################# Testing all inline comment functions #################
+# Testing all inline comment functions #################
 
 # mp_url = "https://code.launchpad.net/~a-dubs/cloudware/+git/oraclelib/+merge/455155"
 # preview_diff_id = "1055515"
@@ -46,7 +46,7 @@
 # print("After updating the draft comment:")
 # pprint(draft_ilc)
 
-# # show the inline comments 
+# # show the inline comments
 # ilc = get_inline_comments(
 #     mp_url=mp_url,
 #     preview_diff_id=preview_diff_id
@@ -75,8 +75,9 @@
 # print("After posting new inline comment, draft comments:")
 # pprint(draft_ilc)
 
-import lp_microservice.lp_service as lp_service
 from pprint import pprint
+from diskcache import Cache
+from lp_microservice import lp_service
 
 
 mp_url = "https://code.launchpad.net/~a-dubs/cloudware/+git/oraclelib/+merge/455155"
@@ -100,4 +101,26 @@ lp_service.perform_authentication()
 #         print(comment["date_created"])
 
 
-print(lp_service.fetch_diff_text(mp_url, "1055515"))
+# r = lp_service.get_preview_diff_text(mp_url, "1055515")
+# print(x := r[400:600])
+
+# # create cache in local directory
+# test_cache = Cache(".test_cache")
+
+# test_cache.set("r", r)
+# print(y := test_cache.get("r")[400:600])
+# print(x == y)
+
+# r =lp_service.create_webhook_for_repo(
+#     repo_url="https://code.launchpad.net/~cloudware/cloudware/+git/cpc_jenkins",
+#     webhook_url="https://webhook.site/6957cd78-bae1-4974-9079-e7dc3fa680da",
+# )
+# print(r)
+
+# r = lp_service.get_repo("https://code.launchpad.net/~a-dubs/cloudware/+git/oraclelib")
+# pprint(r)
+
+# r = lp_service._lp_get("https://api.launchpad.net/devel/~cloudware/cloudware/+git/oraclelib/webhooks")
+
+# pprint(r)
+

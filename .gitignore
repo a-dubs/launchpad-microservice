@@ -1,20 +1,80 @@
-.vscode
-
-# ignore common python files
-*.pyc
-*.pyo
-*.pyd
-
-# ignore python cache
+# Byte-compiled files
 __pycache__/
+*.py[cod]
+*$py.class
 
-# ignore python env
-venv/
-
-# ignore python build
+# Distribution / packaging
+.Python
 build/
+develop-eggs/
 dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
 *.egg-info/
+.installed.cfg
+*.egg
 
-# ignore secrets 
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Sphinx documentation
+docs/_build/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Environments and editor settings
+*.env
+*.env.*
 .env
+*.VSCodeCounter
+.vscode-counter/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre
+.pyre/
+
+# profiling data
+.prof
+
+# ignore anything with "ignore" in the name
+*ignore*
